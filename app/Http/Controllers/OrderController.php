@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use App\Http\Requests\StoreOrderRequest;
-use App\Models\Client; use App\Models\Order; use App\Models\Platform; use App\Models\ServicePackage;
+use App\Models\Client; use App\Models\Order; use App\Models\Platform;
 use App\Services\OrderDocumentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,14 +10,14 @@ class OrderController extends Controller
     public function __construct(private OrderDocumentService $documents) {}
 
     public function index() { $orders=Order::with(['client','platform'])->latest('ordered_at')->paginate(15); return view('orders.index',compact('orders')); }
-    public function create() { return view('orders.form',['order'=>new Order(),'clients'=>Client::orderBy('name')->get(),'platforms'=>Platform::where('is_active',true)->orderBy('name')->get(),'packages'=>ServicePackage::where('is_active',true)->orderBy('name')->get()]); }
+    public function create() { return view('orders.form',['order'=>new Order(),'clients'=>Client::orderBy('name')->get(),'platforms'=>Platform::where('is_active',true)->orderBy('name')->get()]); }
 
     /**
      * Detail order: semua dokumen (invoice, PKS, pembayaran masuk) dikelola dari sini.
      */
     public function show(Order $order)
     {
-        $order->load(['client', 'platform', 'servicePackage', 'feeItems', 'invoices.payments.paymentInvoice', 'agreements.versions']);
+        $order->load(['client', 'platform', 'feeItems', 'invoices.payments.paymentInvoice', 'agreements.versions']);
 
         // Order lama tanpa dokumen tetap dilengkapi saat dibuka.
         $invoice = $this->documents->ensureInvoice($order);
@@ -64,7 +64,7 @@ class OrderController extends Controller
         return redirect()->route('orders.show', $order)->with('success','Order berhasil ditambahkan. Invoice dan perjanjian sudah dibuat.');
     }
 
-    public function edit(Order $order) { $order->load('feeItems'); return view('orders.form',['order'=>$order,'clients'=>Client::orderBy('name')->get(),'platforms'=>Platform::where('is_active',true)->orderBy('name')->get(),'packages'=>ServicePackage::where('is_active',true)->orderBy('name')->get()]); }
+    public function edit(Order $order) { $order->load('feeItems'); return view('orders.form',['order'=>$order,'clients'=>Client::orderBy('name')->get(),'platforms'=>Platform::where('is_active',true)->orderBy('name')->get()]); }
 
     public function update(StoreOrderRequest $request, Order $order)
     {

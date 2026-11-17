@@ -6,7 +6,6 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\PlatformController;
-use App\Http\Controllers\ServicePackageController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
@@ -36,7 +35,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/platforms/{platform}/fee-rules', [PlatformController::class, 'storeFeeRule'])->name('platforms.fee-rules.store');
     Route::delete('/platforms/{platform}/fee-rules/{feeRule}', [PlatformController::class, 'destroyFeeRule'])->name('platforms.fee-rules.destroy');
     Route::resource('clients', ClientController::class);
-    Route::resource('service-packages', ServicePackageController::class)->except('show');
+    
     Route::resource('expense-categories', ExpenseCategoryController::class)->except(['show', 'create', 'edit']);
     Route::resource('orders', OrderController::class)->only(['index', 'create', 'store', 'show', 'edit', 'update']);
     Route::post('/orders/{order}/payments', [PaymentController::class, 'storeForOrder'])->name('orders.payments.store');
@@ -62,7 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/datatable/agreements', [DataTableController::class, 'agreements'])->name('datatable.agreements');
     Route::get('/datatable/subscriptions', [DataTableController::class, 'subscriptions'])->name('datatable.subscriptions');
     Route::get('/datatable/projects', [DataTableController::class, 'projects'])->name('datatable.projects');
-    Route::get('/datatable/service-packages', [DataTableController::class, 'servicePackages'])->name('datatable.service-packages');
+    
     Route::get('/datatable/platforms', [DataTableController::class, 'platforms'])->name('datatable.platforms');
     Route::get('/datatable/expense-categories', [DataTableController::class, 'expenseCategories'])->name('datatable.expense-categories');
     Route::get('/datatable/document-templates', [DataTableController::class, 'documentTemplates'])->name('datatable.document-templates');

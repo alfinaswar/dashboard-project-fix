@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\ExpenseCategory;
 use App\Models\Platform;
-use App\Models\ServicePackage;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Project;
@@ -24,7 +23,6 @@ class DashboardController extends Controller
         $month = Carbon::now();
         $platformCount = Platform::count();
         $clientCount = Client::count();
-        $packageCount = ServicePackage::count();
         $categoryCount = ExpenseCategory::count();
 
         $recentClients = Client::with('platform')->latest()->take(5)->get();
@@ -44,7 +42,7 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'platformCount',
             'clientCount',
-            'packageCount',
+            
             'categoryCount',
             'recentClients',
             'monthlyNet',

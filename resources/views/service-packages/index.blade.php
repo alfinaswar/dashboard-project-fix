@@ -1,5 +1,0 @@
-@extends('layouts.admin')
-@section('title', 'Paket Layanan') @section('page_title', 'Master Paket Layanan')
-@section('page_actions')<a href="{{ route('service-packages.create') }}" class="btn btn-primary"><i class="fas fa-plus mr-1"></i> Tambah Paket</a>@endsection
-@section('content')<div class="card card-outline card-primary"><div class="card-body"><table id="service-packages-table" class="table table-hover w-100"><thead class="thead-light"><tr><th>Nama</th><th>Harga Default</th><th>Durasi</th><th>Status</th><th>Aksi</th></tr></thead></table></div></div>@endsection
-@section('scripts')<script>$(function(){ $('#service-packages-table').DataTable({processing:true,serverSide:true,ajax:'{{ route('datatable.service-packages') }}',language:dtLanguage,columns:[{data:'name',name:'name'},{data:'default_price',name:'default_price'},{data:'default_duration_months',name:'default_duration_months'},{data:'is_active',name:'is_active'},{data:'actions',name:'actions',orderable:false,searchable:false}]}); });</script>@endsection

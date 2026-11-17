@@ -10,7 +10,8 @@ class ServicePackage extends Model
 
     public const BILLING_TYPES = [
         'one_time' => 'Sekali beli',
-        'subscription' => 'Langganan',
+        'annual' => 'Tahunan',
+        'monthly' => 'Bulanan',
     ];
 
     protected $casts = [

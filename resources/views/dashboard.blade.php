@@ -52,21 +52,6 @@
     <div class="col-lg-3 col-6">
         <div class="small-box bg-white border shadow-sm">
             <div class="inner">
-                <h3 class="text-info font-weight-bold">{{ $packageCount }}</h3>
-                <p class="text-muted mb-0">Paket Layanan</p>
-            </div>
-            <div class="icon">
-                <i class="fas fa-box-open text-muted" style="opacity: 0.3;"></i>
-            </div>
-            <a href="{{ route('service-packages.index') }}" class="small-box-footer text-info font-weight-bold bg-light">
-                Kelola Paket <i class="fas fa-arrow-circle-right"></i>
-            </a>
-        </div>
-    </div>
-
-    <div class="col-lg-3 col-6">
-        <div class="small-box bg-white border shadow-sm">
-            <div class="inner">
                 <h3 class="text-warning font-weight-bold">{{ $categoryCount }}</h3>
                 <p class="text-muted mb-0">Kategori Pengeluaran</p>
             </div>

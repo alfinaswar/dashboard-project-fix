@@ -65,7 +65,7 @@ return [
         'active' => ['clients.*'],
     ],
     [
-        'text' => 'Paket Layanan',
+        'text' => 'Master Jenis Order',
         'route' => 'service-packages.index',
         'icon' => 'fas fa-box-open',
         'active' => ['service-packages.*'],

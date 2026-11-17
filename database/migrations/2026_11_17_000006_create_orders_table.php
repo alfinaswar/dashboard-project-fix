@@ -4,14 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('client_id')->constrained()->restrictOnDelete();
             $table->foreignId('platform_id')->constrained()->restrictOnDelete();
-            $table->foreignId('service_package_id')->nullable()->constrained()->nullOnDelete();
+            $table->enum('billing_type', ['one_time' => 'Sekali beli', 'annual' => 'Tahunan', 'monthly' => 'Bulanan'])->default('one_time');
             $table->string('title');
             $table->string('external_order_ref')->nullable();
             $table->date('ordered_at');
@@ -35,5 +36,8 @@ return new class extends Migration {
         });
     }
 
-    public function down(): void { Schema::dropIfExists('orders'); }
+    public function down(): void
+    {
+        Schema::dropIfExists('orders');
+    }
 };
