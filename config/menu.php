@@ -15,42 +15,36 @@ return [
         'route' => 'orders.index',
         'icon' => 'fas fa-clipboard-list',
         'active' => ['orders.*'],
-        'soon' => true,
     ],
     [
         'text' => 'Penarikan Saldo',
         'route' => 'withdrawals.index',
         'icon' => 'fas fa-wallet',
         'active' => ['withdrawals.*'],
-        'soon' => true,
     ],
     [
         'text' => 'Invoice',
         'route' => 'invoices.index',
         'icon' => 'fas fa-file-invoice-dollar',
         'active' => ['invoices.*'],
-        'soon' => true,
     ],
     [
         'text' => 'Perjanjian Kerjasama',
         'route' => 'agreements.index',
         'icon' => 'fas fa-file-contract',
         'active' => ['agreements.*'],
-        'soon' => true,
     ],
     [
         'text' => 'Langganan & Masa Aktif',
         'route' => 'subscriptions.index',
         'icon' => 'fas fa-clock',
         'active' => ['subscriptions.*'],
-        'soon' => true,
     ],
     [
         'text' => 'Pembayaran Masuk',
         'route' => 'payments.index',
         'icon' => 'fas fa-money-bill-wave',
         'active' => ['payments.*'],
-        'soon' => true,
     ],
     [
         'text' => 'Pengeluaran',
@@ -64,7 +58,12 @@ return [
         'route' => 'projects.index',
         'icon' => 'fas fa-tasks',
         'active' => ['projects.*'],
-        'soon' => true,
+    ],
+    [
+        'text' => 'Laporan',
+        'route' => 'reports.index',
+        'icon' => 'fas fa-chart-bar',
+        'active' => ['reports.*'],
     ],
     [
         'header' => 'MASTER DATA',
@@ -101,5 +100,11 @@ return [
         'route' => 'settings.index',
         'icon' => 'fas fa-cogs',
         'active' => ['settings.*'],
+    ],
+    [
+        'text' => 'Template Dokumen',
+        'route' => 'document-templates.index',
+        'icon' => 'fas fa-file-alt',
+        'active' => ['document-templates.*'],
     ],
 ];

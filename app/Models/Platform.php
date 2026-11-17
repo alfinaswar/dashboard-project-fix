@@ -28,28 +28,48 @@ class Platform extends Model
      * Calculate platform fee based on gross amount.
      * Formula: round(gross * commission_percent / 100) + fixed_fee
      *
-     * @param int|float $grossAmount
+     * @param int $grossAmount
      * @return int
      */
-    public function calculateFee(int|float $grossAmount): int
+    public function calculateFee(int $grossAmount): int
     {
-        $commission = ($grossAmount * (float) $this->commission_percent) / 100;
-        return (int) (round($commission) + $this->fixed_fee);
+        $percentBasisPoints = (int) round(((float) $this->commission_percent) * 100);
+        return intdiv(($grossAmount * $percentBasisPoints) + 5000, 10000) + $this->fixed_fee;
+    }
+
+    public function feeRules()
+    {
+        return $this->hasMany(PlatformFeeRule::class);
+    }
+
+    /**
+     * Pakai tarif terbaru yang berlaku; jatuh ke formula lama kalau belum ada tarif.
+     */
+    public function feeRuleFor(string $date): ?PlatformFeeRule
+    {
+        return PlatformFeeRule::activeFor($this->id, $date);
+    }
+
+    public function feeFor(int $grossAmount, ?string $date = null): int
+    {
+        $rule = $this->feeRuleFor($date ?? now()->toDateString());
+
+        return $rule ? $rule->calculateFee($grossAmount) : $this->calculateFee($grossAmount);
     }
 
     /**
      * Calculate net amount.
      * Formula: gross - platform_fee - other_fee
      *
-     * @param int|float $grossAmount
-     * @param int|float $otherFee
+     * @param int $grossAmount
+     * @param int $otherFee
      * @param int|null $platformFeeOverride
      * @return int
      */
-    public function calculateNet(int|float $grossAmount, int|float $otherFee = 0, ?int $platformFeeOverride = null): int
+    public function calculateNet(int $grossAmount, int $otherFee = 0, ?int $platformFeeOverride = null): int
     {
         $fee = $platformFeeOverride !== null ? $platformFeeOverride : $this->calculateFee($grossAmount);
-        return (int) round($grossAmount - $fee - $otherFee);
+        return $grossAmount - $fee - $otherFee;
     }
 
     public function clients(): HasMany

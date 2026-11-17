@@ -1,0 +1,8 @@
+@extends('layouts.admin')
+@section('title', 'Laporan')
+@section('page_title', 'Laporan Order')
+@section('page_actions')<a href="{{ route('reports.export', request()->query()) }}" class="btn btn-success"><i class="fas fa-file-csv mr-1"></i> Ekspor CSV</a>@endsection
+@section('content')
+<div class="card card-outline card-primary"><div class="card-body"><form class="form-row mb-3"><div class="col-md-3"><label>Dari</label><input placeholder="Pilih tanggal" type="date" id="filter-from" name="from" class="form-control" value="{{ $from->format('Y-m-d') }}"></div><div class="col-md-3"><label>Sampai</label><input placeholder="Pilih tanggal" type="date" id="filter-to" name="to" class="form-control" value="{{ $to->format('Y-m-d') }}"></div><div class="col-md-2 align-self-end"><button type="button" id="filter-apply" class="btn btn-primary">Filter</button></div></form><table id="reports-table" class="table table-hover w-100"><thead><tr><th>Tanggal</th><th>Judul</th><th>Platform</th><th>Status</th><th>Kotor</th><th>Potongan</th><th>Bersih</th></tr></thead></table></div></div>
+@endsection
+@section('scripts')<script>$(function(){ $('#reports-table').DataTable({processing:true,serverSide:true,ajax:{url:'{{ route('datatable.reports') }}',data:function(d){d.from=$('#filter-from').val();d.to=$('#filter-to').val();}},language:dtLanguage,columns:[{data:'ordered_at',name:'ordered_at'},{data:'title',name:'title'},{data:'platform_name',name:'platform.name',orderable:false},{data:'status',name:'status'},{data:'gross_amount',name:'gross_amount'},{data:'platform_fee',name:'platform_fee'},{data:'net_amount',name:'net_amount'}]}); $('#filter-apply').on('click',function(){ $('#reports-table').DataTable().ajax.reload(); }); });</script>@endsection

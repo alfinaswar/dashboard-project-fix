@@ -18,90 +18,21 @@
                     <i class="fas fa-layer-group text-primary mr-1"></i> Daftar Platform
                 </h3>
             </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover table-striped align-middle mb-0">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Nama Platform</th>
-                                <th>Kode</th>
-                                <th>Komisi (%)</th>
-                                <th>Biaya Tetap</th>
-                                <th>Biaya Tarik</th>
-                                <th>Status</th>
-                                <th>Klien</th>
-                                <th class="text-right">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($platforms as $platform)
-                                <tr>
-                                    <td class="font-weight-bold text-dark">
-                                        {{ $platform->name }}
-                                        @if($platform->notes)
-                                            <div class="small text-muted font-weight-normal">{{ $platform->notes }}</div>
-                                        @endif
-                                    </td>
-                                    <td><span class="badge badge-secondary">{{ $platform->code }}</span></td>
-                                    <td class="font-weight-bold text-primary">{{ number_format($platform->commission_percent, 2) }}%</td>
-                                    <td>{{ format_rupiah($platform->fixed_fee) }}</td>
-                                    <td>{{ format_rupiah($platform->withdrawal_fee) }}</td>
-                                    <td>
-                                        @if($platform->is_active)
-                                            <span class="badge badge-success">Aktif</span>
-                                        @else
-                                            <span class="badge badge-danger">Nonaktif</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-light border">{{ $platform->clients_count }}</span>
-                                    </td>
-                                    <td class="text-right">
-                                        <div class="btn-group">
-                                            <a href="{{ route('platforms.edit', $platform) }}" class="btn btn-sm btn-outline-secondary" title="Ubah">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Hapus" data-toggle="modal" data-target="#deleteModal{{ $platform->id }}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-
-                                        <!-- Modal Delete -->
-                                        <div class="modal fade" id="deleteModal{{ $platform->id }}" tabindex="-1" role="dialog" aria-hidden="true">
-                                            <div class="modal-dialog modal-dialog-centered text-left">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title font-weight-bold">Konfirmasi Hapus</h5>
-                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                            <span aria-hidden="true">&times;</span>
-                                                        </button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Apakah Anda yakin ingin menghapus platform <strong>{{ $platform->name }}</strong>?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                                        <form action="{{ route('platforms.destroy', $platform) }}" method="POST">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger font-weight-bold">Ya, Hapus</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="8" class="text-center py-4 text-muted">
-                                        Belum ada platform.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+            <div class="card-body">
+                <table id="platforms-table" class="table table-hover table-striped align-middle w-100">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Nama Platform</th>
+                            <th>Kode</th>
+                            <th>Komisi (%)</th>
+                            <th>Biaya Tetap</th>
+                            <th>Biaya Tarik</th>
+                            <th>Status</th>
+                            <th>Klien</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                </table>
             </div>
         </div>
     </div>
@@ -132,12 +63,12 @@
 
                 <div class="form-group">
                     <label for="sim_gross">Nilai Kotor / Gross (Rp)</label>
-                    <input type="number" id="sim_gross" class="form-control" value="1000000" step="1000">
+                    <input placeholder="Masukkan " type="number" id="sim_gross" class="form-control" value="1000000" step="1000">
                 </div>
 
                 <div class="form-group">
                     <label for="sim_other">Biaya Lain / Extra (Rp)</label>
-                    <input type="number" id="sim_other" class="form-control" value="0" step="1000">
+                    <input placeholder="Masukkan " type="number" id="sim_other" class="form-control" value="0" step="1000">
                 </div>
 
                 <div class="p-3 bg-light rounded border">
@@ -163,6 +94,22 @@
 
 @section('scripts')
 <script>
+    $(function() {
+        $('#platforms-table').DataTable({
+            processing: true, serverSide: true, ajax: '{{ route('datatable.platforms') }}', language: dtLanguage,
+            columns: [
+                { data: 'name', name: 'name' },
+                { data: 'code', name: 'code' },
+                { data: 'commission_percent', name: 'commission_percent' },
+                { data: 'fixed_fee', name: 'fixed_fee' },
+                { data: 'withdrawal_fee', name: 'withdrawal_fee' },
+                { data: 'is_active', name: 'is_active' },
+                { data: 'clients_count', name: 'clients_count', orderable: false, searchable: false },
+                { data: 'actions', name: 'actions', orderable: false, searchable: false }
+            ]
+        });
+    });
+
     function formatRupiah(num) {
         return 'Rp ' + Math.round(num).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }

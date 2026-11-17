@@ -38,8 +38,16 @@ return [
             'report' => false,
         ],
 
-        'public' => [
+        // Alias untuk storage/app/private; dipakai dokumen invoice & perjanjian.
+        'private' => [
             'driver' => 'local',
+            'root' => storage_path('app/private'),
+            'serve' => false,
+            'throw' => false,
+            'report' => false,
+        ],
+
+        'public' => [            'driver' => 'local',
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',

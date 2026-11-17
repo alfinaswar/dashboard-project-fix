@@ -36,7 +36,7 @@
                         <div class="col-md-4 form-group">
                             <label for="commission_percent">Komisi Platform (%) <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input type="number" step="0.01" min="0" max="100" class="form-control @error('commission_percent') is-invalid @enderror" id="commission_percent" name="commission_percent" value="{{ old('commission_percent', '0.00') }}" required>
+                                <input placeholder="Masukkan commission percent" type="number" step="0.01" min="0" max="100" class="form-control @error('commission_percent') is-invalid @enderror" id="commission_percent" name="commission_percent" value="{{ old('commission_percent', '0.00') }}" required>
                                 <div class="input-group-append">
                                     <span class="input-group-text">%</span>
                                 </div>
@@ -53,7 +53,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="number" min="0" class="form-control @error('fixed_fee') is-invalid @enderror" id="fixed_fee" name="fixed_fee" value="{{ old('fixed_fee', '0') }}" required>
+                                <input placeholder="Masukkan fixed fee" type="number" min="0" class="form-control @error('fixed_fee') is-invalid @enderror" id="fixed_fee" name="fixed_fee" value="{{ old('fixed_fee', '0') }}" required>
                             </div>
                             <small class="form-text text-muted">Isi 0 jika tidak ada biaya tetap.</small>
                             @error('fixed_fee')
@@ -67,7 +67,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input type="number" min="0" class="form-control @error('withdrawal_fee') is-invalid @enderror" id="withdrawal_fee" name="withdrawal_fee" value="{{ old('withdrawal_fee', '0') }}" required>
+                                <input placeholder="Masukkan withdrawal fee" type="number" min="0" class="form-control @error('withdrawal_fee') is-invalid @enderror" id="withdrawal_fee" name="withdrawal_fee" value="{{ old('withdrawal_fee', '0') }}" required>
                             </div>
                             <small class="form-text text-muted">Biaya transfer bank saat menarik dana.</small>
                             @error('withdrawal_fee')

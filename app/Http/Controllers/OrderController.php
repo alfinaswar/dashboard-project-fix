@@ -1,0 +1,14 @@
+<?php
+namespace App\Http\Controllers;
+use App\Http\Requests\StoreOrderRequest;
+use App\Models\Client; use App\Models\Order; use App\Models\Platform; use App\Models\ServicePackage;
+use Illuminate\Http\Request;
+class OrderController extends Controller
+{
+    public function index() { $orders=Order::with(['client','platform'])->latest('ordered_at')->paginate(15); return view('orders.index',compact('orders')); }
+    public function create() { return view('orders.form',['order'=>new Order(),'clients'=>Client::orderBy('name')->get(),'platforms'=>Platform::where('is_active',true)->orderBy('name')->get(),'packages'=>ServicePackage::where('is_active',true)->orderBy('name')->get()]); }
+    public function store(StoreOrderRequest $request) { $data=$request->validated(); $platform=Platform::findOrFail($data['platform_id']); $override=$data['platform_fee_override'] ?? null; $rule=$platform->feeRuleFor($data['ordered_at']); $data['platform_fee']=$override ?? ($rule ? $rule->calculateFee((int)$data['gross_amount']) : $platform->calculateFee((int)$data['gross_amount'])); $data['platform_fee_rule_id']=$override ? null : $rule?->id; $data['net_amount']=(int)$data['gross_amount']-$data['platform_fee']-(int)($data['other_fee']??0); $data['payout_status']=$platform->code==='direct'?'pending':'pending'; unset($data['platform_fee_override']); Order::create($data); return redirect()->route('orders.index')->with('success','Order berhasil ditambahkan.'); }
+    public function edit(Order $order) { if($order->payout_status==='withdrawn') return back()->with('error','Order yang sudah ditarik tidak dapat diubah.'); return view('orders.form',['order'=>$order,'clients'=>Client::orderBy('name')->get(),'platforms'=>Platform::where('is_active',true)->orderBy('name')->get(),'packages'=>ServicePackage::where('is_active',true)->orderBy('name')->get()]); }
+    public function update(StoreOrderRequest $request, Order $order) { if($order->payout_status==='withdrawn') return back()->with('error','Order yang sudah ditarik tidak dapat diubah.'); $data=$request->validated(); $platform=Platform::findOrFail($data['platform_id']); $override=$data['platform_fee_override'] ?? null; $rule=$platform->feeRuleFor($data['ordered_at']); $data['platform_fee']=$override ?? ($rule ? $rule->calculateFee((int)$data['gross_amount']) : $platform->calculateFee((int)$data['gross_amount'])); $data['platform_fee_rule_id']=$override ? null : $rule?->id; $data['net_amount']=(int)$data['gross_amount']-$data['platform_fee']-(int)($data['other_fee']??0); unset($data['platform_fee_override']); $order->update($data); return redirect()->route('orders.index')->with('success','Order berhasil diperbarui.'); }
+    public function updatePayout(Request $request, Order $order) { $data=$request->validate(['payout_status'=>['required','in:pending,in_balance,received']]); $order->update($data); return back()->with('success','Status pencairan berhasil diperbarui.'); }
+}

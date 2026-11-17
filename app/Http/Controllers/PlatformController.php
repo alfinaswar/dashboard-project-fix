@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePlatformRequest;
 use App\Http\Requests\UpdatePlatformRequest;
 use App\Models\Platform;
+use App\Models\PlatformFeeRule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PlatformController extends Controller
 {
@@ -16,6 +18,51 @@ class PlatformController extends Controller
     {
         $platforms = Platform::withCount('clients')->orderBy('id')->get();
         return view('platforms.index', compact('platforms'));
+    }
+
+    public function feeRules(Platform $platform)
+    {
+        $rules = $platform->feeRules()->with('components')->orderByDesc('effective_from')->get();
+
+        return view('platforms.fee-rules', compact('platform', 'rules'));
+    }
+
+    public function storeFeeRule(Request $request, Platform $platform)
+    {
+        $data = $request->validate([
+            'effective_from' => ['required', 'date'],
+            'effective_to' => ['nullable', 'date', 'after_or_equal:effective_from'],
+            'note' => ['nullable', 'string', 'max:255'],
+            'components' => ['required', 'array', 'min:1'],
+            'components.*.type' => ['required', 'in:percent,fixed,min,max'],
+            'components.*.value' => ['required', 'numeric', 'min:0'],
+            'components.*.note' => ['nullable', 'string', 'max:255'],
+        ], [
+            'effective_from.required' => 'Tanggal mulai berlaku wajib diisi.',
+            'components.required' => 'Minimal satu komponen potongan harus diisi.',
+            'components.*.type.required' => 'Jenis potongan wajib dipilih.',
+            'components.*.value.required' => 'Nilai potongan wajib diisi.',
+        ]);
+
+        $components = $data['components'];
+        unset($data['components']);
+
+        DB::transaction(function () use ($platform, $data, $components) {
+            $rule = $platform->feeRules()->create($data);
+            foreach (array_values($components) as $position => $component) {
+                $rule->components()->create([...$component, 'position' => $position]);
+            }
+        });
+
+        return redirect()->route('platforms.fee-rules', $platform)->with('success', 'Tarif potongan berhasil ditambahkan.');
+    }
+
+    public function destroyFeeRule(Platform $platform, PlatformFeeRule $feeRule)
+    {
+        abort_unless($feeRule->platform_id === $platform->id, 404);
+        $feeRule->delete();
+
+        return redirect()->route('platforms.fee-rules', $platform)->with('success', 'Tarif potongan berhasil dihapus. Order lama tidak terpengaruh.');
     }
 
     /**

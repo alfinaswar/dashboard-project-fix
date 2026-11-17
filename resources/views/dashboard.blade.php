@@ -5,6 +5,20 @@
 
 @section('content')
 <div class="row">
+    @foreach([
+        ['monthlyNet', 'Pendapatan Bersih Bulan Ini', 'success', 'orders.index'],
+        ['monthlyFees', 'Potongan Platform Bulan Ini', 'warning', 'orders.index'],
+        ['balancePending', 'Saldo Fastwork Belum Ditarik', 'info', 'orders.index'],
+        ['unpaidInvoices', 'Tagihan Belum Lunas', 'danger', 'invoices.index'],
+    ] as [$metric, $label, $color, $route])
+        <div class="col-lg-3 col-6"><div class="small-box bg-white border shadow-sm"><div class="inner"><h3 class="text-{{ $color }} font-weight-bold">{{ format_rupiah($$metric) }}</h3><p class="text-muted mb-0">{{ $label }}</p></div><a href="{{ route($route) }}" class="small-box-footer text-{{ $color }} font-weight-bold bg-light">Lihat detail <i class="fas fa-arrow-circle-right"></i></a></div></div>
+    @endforeach
+</div>
+<div class="row">
+    <div class="col-lg-4"><div class="small-box bg-white border shadow-sm"><div class="inner"><h3 class="text-primary font-weight-bold">{{ $expiringSubscriptions }}</h3><p class="text-muted mb-0">Langganan Berakhir 30 Hari</p></div><a href="{{ route('subscriptions.index') }}" class="small-box-footer text-primary font-weight-bold bg-light">Lihat langganan <i class="fas fa-arrow-circle-right"></i></a></div></div>
+    <div class="col-lg-8"><div class="card card-outline card-primary shadow-sm"><div class="card-header"><h3 class="card-title font-weight-bold">Proyek Aktif</h3></div><div class="card-body p-0"><table class="table table-sm mb-0"><thead><tr><th>Proyek</th><th>Klien</th><th>Progress</th></tr></thead><tbody>@forelse($activeProjects as $project)<tr><td><a href="{{ route('projects.show',$project) }}">{{ $project->name }}</a></td><td>{{ $project->client->name }}</td><td><div class="progress"><div class="progress-bar" style="width:{{ $project->progress_percent }}%">{{ $project->progress_percent }}%</div></div></td></tr>@empty<tr><td colspan="3" class="text-center text-muted">Belum ada proyek aktif.</td></tr>@endforelse</tbody></table></div></div></div>
+</div>
+<div class="row">
     <div class="col-lg-3 col-6">
         <div class="small-box bg-white border shadow-sm">
             <div class="inner">
@@ -146,18 +160,18 @@
             <div class="card-body">
                 <div class="callout callout-success mb-3">
                     <h6 class="font-weight-bold text-success mb-1">
-                        <i class="fas fa-check-circle mr-1"></i> Fase 1: Selesai / Berjalan
+                        <i class="fas fa-check-circle mr-1"></i> Sistem siap digunakan
                     </h6>
                     <p class="small text-muted mb-0">
-                        Setup autentikasi, master platform & klien, paket layanan, kategori pengeluaran, pengaturan usaha, dan kalkulator potongan Fastwork.
+                        Auth, master data, order, invoice, perjanjian, langganan, proyek, dashboard, laporan, dan notifikasi tersedia.
                     </p>
                 </div>
                 <div class="callout callout-info mb-3">
                     <h6 class="font-weight-bold text-info mb-1">
-                        <i class="fas fa-clock mr-1"></i> Fase 2: Siap Dimulai
+                        <i class="fas fa-clock mr-1"></i> Fase 8: Verifikasi
                     </h6>
                     <p class="small text-muted mb-0">
-                        Pencatatan order Fastwork & klien langsung, perhitungan potongan platform, penarikan saldo (withdrawal), dan pembayaran masuk.
+                        Jalankan scheduler harian dan backup database sebelum deploy produksi.
                     </p>
                 </div>
                 <a href="{{ route('settings.index') }}" class="btn btn-outline-secondary btn-block btn-sm">
