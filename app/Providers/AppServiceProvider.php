@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Aplikasi ini hanya menyediakan terjemahan Indonesia (folder lang/id),
+        // jadi locale dipaksa "id" walau APP_LOCALE di .env masih bawaan "en".
+        app()->setLocale('id');
     }
 }

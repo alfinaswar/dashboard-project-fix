@@ -25,7 +25,7 @@
                 <div class="row small">
                     <div class="col-md-6 mb-2"><span class="text-muted">Klien</span><div class="font-weight-bold">{{ $order->client?->name ?? '-' }}</div></div>
                     <div class="col-md-6 mb-2"><span class="text-muted">Platform</span><div class="font-weight-bold">{{ $order->platform?->name ?? 'Langsung' }}</div></div>
-                    <div class="col-md-6 mb-2"><span class="text-muted">Paket Layanan</span><div class="font-weight-bold">{{ $order->servicePackage?->name ?? '-' }}</div></div>
+                    <div class="col-md-6 mb-2"><span class="text-muted">Jenis Order</span><div class="font-weight-bold">{{ \App\Models\ServicePackage::BILLING_TYPES[$order->billing_type] ?? '-' }}</div></div>
                     <div class="col-md-6 mb-2"><span class="text-muted">Tanggal Order</span><div class="font-weight-bold">{{ format_date($order->ordered_at) }}</div></div>
                     <div class="col-md-6 mb-2"><span class="text-muted">Deadline</span><div class="font-weight-bold">{{ $order->deadline ? format_date($order->deadline) : '-' }}</div></div>
                     <div class="col-md-6 mb-2"><span class="text-muted">Status Pekerjaan</span><div class="font-weight-bold">{{ ucfirst(str_replace('_', ' ', $order->status)) }}</div></div>

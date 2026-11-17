@@ -42,7 +42,6 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'platformCount',
             'clientCount',
-            
             'categoryCount',
             'recentClients',
             'monthlyNet',

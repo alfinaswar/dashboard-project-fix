@@ -22,6 +22,12 @@ return new class extends Migration
 
         if (Schema::hasColumn('orders', 'payout_status')) {
             Schema::table('orders', function (Blueprint $table) {
+                // Index harus dilepas dulu; sebagian driver (mis. SQLite) menolak
+                // drop kolom yang masih dipakai index.
+                $table->dropIndex(['payout_status']);
+            });
+
+            Schema::table('orders', function (Blueprint $table) {
                 $table->dropColumn('payout_status');
             });
         }

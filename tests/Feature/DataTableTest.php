@@ -20,7 +20,7 @@ class DataTableTest extends TestCase
         $endpoints = [
             'datatable.orders', 'datatable.invoices', 'datatable.clients', 'datatable.payments',
             'datatable.agreements', 'datatable.subscriptions', 'datatable.projects',
-            'datatable.service-packages', 'datatable.platforms', 'datatable.expense-categories',
+            'datatable.platforms', 'datatable.expense-categories',
             'datatable.document-templates', 'datatable.reports',
         ];
 
@@ -51,7 +51,7 @@ class DataTableTest extends TestCase
 
         $pages = [
             'orders.index', 'invoices.index', 'clients.index', 'payments.index', 'agreements.index',
-            'subscriptions.index', 'projects.index', 'service-packages.index',
+            'subscriptions.index', 'projects.index',
             'platforms.index', 'expense-categories.index', 'document-templates.index', 'reports.index',
         ];
 

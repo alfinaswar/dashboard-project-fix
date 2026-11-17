@@ -22,7 +22,7 @@ class SubscriptionReminderNotification extends Notification
     {
         return [
             'title' => 'Langganan akan berakhir',
-            'message' => "Langganan {$this->subscription->servicePackage->name} untuk {$this->subscription->client->name} berakhir dalam {$this->days} hari.",
+            'message' => "Langganan {$this->subscription->billing_type_label} untuk {$this->subscription->client?->name} berakhir dalam {$this->days} hari.",
             'subscription_id' => $this->subscription->id,
         ];
     }

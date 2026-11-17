@@ -19,7 +19,7 @@ class SendSubscriptionReminders extends Command
         Subscription::whereDate('end_date', '>=', $today)->whereDate('end_date', '<=', $today->copy()->addDays(30))->chunkById(100, function ($subscriptions) use ($today, &$count) {
             foreach ($subscriptions as $subscription) {
                 $days = $today->diffInDays($subscription->end_date, false);
-                $column = match ($days) {
+                $column = match ((int) $days) {
                     30 => 'reminder_30_sent_at',
                     14 => 'reminder_14_sent_at',
                     7 => 'reminder_7_sent_at',
@@ -27,7 +27,7 @@ class SendSubscriptionReminders extends Command
                 };
                 if ($column && !$subscription->{$column}) {
                     $subscription->update([$column => now()]);
-                    User::query()->first()?->notify(new SubscriptionReminderNotification($subscription->load(['client', 'servicePackage']), $days));
+                    User::query()->first()?->notify(new SubscriptionReminderNotification($subscription->load(['client']), $days));
                     $count++;
                 }
             }
@@ -35,7 +35,7 @@ class SendSubscriptionReminders extends Command
         Subscription::whereDate('end_date', '<', $today)->whereNull('expired_notified_at')->chunkById(100, function ($subscriptions) use (&$count) {
             foreach ($subscriptions as $subscription) {
                 $subscription->update(['expired_notified_at' => now()]);
-                User::query()->first()?->notify(new SubscriptionReminderNotification($subscription->load(['client', 'servicePackage']), 0));
+                User::query()->first()?->notify(new SubscriptionReminderNotification($subscription->load(['client']), 0));
                 $count++;
             }
         });

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('client_id')->constrained()->restrictOnDelete();
             $table->foreignId('platform_id')->constrained()->restrictOnDelete();
-            $table->enum('billing_type', ['one_time' => 'Sekali beli', 'annual' => 'Tahunan', 'monthly' => 'Bulanan'])->default('one_time');
+            $table->enum('billing_type', ['one_time', 'annual', 'monthly'])->default('one_time');
             $table->string('title');
             $table->string('external_order_ref')->nullable();
             $table->date('ordered_at');
