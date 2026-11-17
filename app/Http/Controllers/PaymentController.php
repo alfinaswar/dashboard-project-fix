@@ -39,7 +39,8 @@ class PaymentController extends Controller
         }
 
         DB::transaction(function () use ($data, $invoice) {
-            Payment::create([...$data, 'invoice_id' => $invoice->id]);
+            $payment = Payment::create([...$data, 'invoice_id' => $invoice->id]);
+            $this->documents->createPaymentInvoice($invoice->order, $payment);
             $lunas = $invoice->paidAmount() >= $invoice->total;
             $invoice->update(['status' => $lunas ? 'paid' : 'partial']);
         });

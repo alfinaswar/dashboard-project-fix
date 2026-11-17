@@ -47,7 +47,7 @@ class DataTableController extends Controller
             ->editColumn('due_date', fn (Invoice $invoice) => $invoice->due_date?->format('d/m/Y') ?? '-')
             ->editColumn('total', fn (Invoice $invoice) => format_rupiah($invoice->total))
             ->editColumn('status', fn (Invoice $invoice) => ucfirst($invoice->status))
-            ->addColumn('actions', fn (Invoice $invoice) => '<a href="'.route('invoices.show', $invoice).'" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a>')
+            ->addColumn('actions', fn (Invoice $invoice) => '<a href="'.route('invoices.show', $invoice).'" class="btn btn-sm btn-outline-primary"><i class="fas fa-eye"></i></a><a href="'.route('invoices.print', $invoice).'" target="_blank" class="btn btn-sm btn-outline-secondary ml-1"><i class="fas fa-print"></i></a>')
             ->rawColumns(['actions'])
             ->toJson();
     }

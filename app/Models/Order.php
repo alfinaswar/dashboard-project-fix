@@ -26,12 +26,16 @@ class Order extends Model
     }
 
     public function invoices() { return $this->hasMany(Invoice::class); }
+
+    /** Invoice order utama; invoice per pembayaran tidak dihitung sebagai tagihan. */
+    public function orderInvoices() { return $this->invoices()->whereNull('payment_id'); }
     public function agreements() { return $this->hasMany(Agreement::class); }
 
     /** Status pembayaran dari invoice order: belum ada invoice dianggap belum dibayar. */
     public function getPaymentStatusAttribute(): string
     {
-        $invoices = $this->relationLoaded('invoices') ? $this->invoices : $this->invoices()->get();
+        $invoices = ($this->relationLoaded('invoices') ? $this->invoices : $this->invoices()->get())
+            ->whereNull('payment_id');
 
         if ($invoices->isEmpty()) {
             return 'unpaid';

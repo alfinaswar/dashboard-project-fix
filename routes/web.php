@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('document-templates', DocumentTemplateController::class)->except('show');
     Route::resource('invoices', InvoiceController::class)->only(['index', 'show']);
     Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])->name('invoices.download');
+    Route::get('/invoices/{invoice}/print', [InvoiceController::class, 'print'])->name('invoices.print');
     Route::resource('agreements', AgreementController::class)->only(['index', 'show', 'update']);
     Route::post('/agreements/{agreement}/send', [AgreementController::class, 'send'])->name('agreements.send');
     Route::post('/agreements/{agreement}/sign', [AgreementController::class, 'sign'])->name('agreements.sign');

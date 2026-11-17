@@ -7,6 +7,7 @@ use App\Models\AgreementVersion;
 use App\Models\DocumentTemplate;
 use App\Models\Invoice;
 use App\Models\Order;
+use App\Models\Payment;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -28,10 +29,10 @@ class OrderDocumentService
             ->sum('amount');
     }
 
-    /** Sisa tagihan yang belum dibayar klien. */
+    /** Sisa tagihan yang belum dibayar klien. Hanya invoice order, bukan invoice pembayaran. */
     public function outstandingFor(Order $order): int
     {
-        return max(0, (int) $order->invoices()->sum('total') - $this->paidFor($order));
+        return max(0, (int) $order->invoices()->whereNull('payment_id')->sum('total') - $this->paidFor($order));
     }
 
     /**
@@ -40,7 +41,7 @@ class OrderDocumentService
      */
     public function ensureInvoice(Order $order): Invoice
     {
-        $existing = $order->invoices()->latest('id')->first();
+        $existing = $order->invoices()->whereNull('payment_id')->latest('id')->first();
 
         if ($existing) {
             return $existing;
@@ -48,7 +49,7 @@ class OrderDocumentService
 
         $issuedAt = Carbon::parse($order->ordered_at ?? now());
         $dueDays = (int) setting('invoice_due_days', 14);
-        $number = $this->nextNumber('invoice_number_format', 'INV/{YYYY}/{MM}/{NUMBER}', $issuedAt, fn (string $prefix) => Invoice::where('number', 'like', $prefix.'%')->orderByDesc('number')->value('number'));
+        $number = $this->nextNumber('invoice_number_format', 'ORD/{YYYY}/{MM}/{NUMBER}', $issuedAt, fn (string $prefix) => Invoice::whereNull('payment_id')->where('number', 'like', $prefix.'%')->orderByDesc('number')->value('number'));
         $template = $this->defaultTemplate('invoice');
 
         $invoice = Invoice::create([
@@ -71,6 +72,41 @@ class OrderDocumentService
             $invoice->update(['pdf_path' => $path]);
         } catch (\Throwable $e) {
             Log::warning('Gagal membuat PDF invoice '.$invoice->number.': '.$e->getMessage());
+        }
+
+        return $invoice;
+    }
+
+    /**
+     * Buat invoice untuk satu pembayaran masuk. Nomornya ikut nomor invoice order
+     * dengan akhiran -B1, -B2, dst supaya mudah dilacak ke ordernya.
+     */
+    public function createPaymentInvoice(Order $order, Payment $payment): Invoice
+    {
+        $orderInvoice = $this->ensureInvoice($order);
+        $issuedAt = Carbon::parse($payment->paid_at ?? now());
+        $sequence = $orderInvoice->payments()->where('id', '<=', $payment->id)->count();
+
+        $invoice = Invoice::create([
+            'number' => $orderInvoice->number.'-B'.$sequence,
+            'source' => 'generated',
+            'order_id' => $order->id,
+            'payment_id' => $payment->id,
+            'template_id' => $orderInvoice->template_id,
+            'issued_at' => $issuedAt->toDateString(),
+            'due_date' => $issuedAt->toDateString(),
+            'subtotal' => (int) $payment->amount,
+            'tax_amount' => 0,
+            'total' => (int) $payment->amount,
+            'status' => 'paid',
+        ]);
+
+        try {
+            $path = 'invoices/'.str_replace('/', '-', $invoice->number).'.pdf';
+            Storage::disk('private')->put($path, Pdf::loadView('invoices.pdf', compact('invoice'))->output());
+            $invoice->update(['pdf_path' => $path]);
+        } catch (\Throwable $e) {
+            Log::warning('Gagal membuat PDF invoice pembayaran '.$invoice->number.': '.$e->getMessage());
         }
 
         return $invoice;

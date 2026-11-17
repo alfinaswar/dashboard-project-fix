@@ -76,17 +76,26 @@
 
                 <div class="table-responsive">
                     <table class="table table-sm table-bordered mb-3">
-                        <thead class="thead-light"><tr><th>Tanggal</th><th>Jumlah</th><th>Metode</th><th>Referensi</th></tr></thead>
+                        <thead class="thead-light"><tr><th>Tanggal</th><th>Jumlah</th><th>Metode</th><th>Referensi</th><th class="text-right">Invoice</th></tr></thead>
                         <tbody>
-                            @forelse($invoice->payments as $payment)
+                            @forelse($invoice->payments->sortBy('paid_at') as $payment)
+                                @php $paymentInvoice = $payment->paymentInvoice; @endphp
                                 <tr>
                                     <td>{{ format_date($payment->paid_at) }}</td>
                                     <td>{{ format_rupiah($payment->amount) }}</td>
                                     <td>{{ ucfirst($payment->method) }}</td>
                                     <td>{{ $payment->reference_no ?: '-' }}</td>
+                                    <td class="text-right text-nowrap">
+                                        @if($paymentInvoice)
+                                            <a href="{{ route('invoices.show', $paymentInvoice) }}" class="btn btn-xs btn-outline-info" title="Lihat invoice pembayaran"><i class="fas fa-eye mr-1"></i> Lihat</a>
+                                            <a href="{{ route('invoices.print', $paymentInvoice) }}" target="_blank" class="btn btn-xs btn-outline-secondary" title="Cetak invoice pembayaran"><i class="fas fa-print mr-1"></i> Cetak</a>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="4" class="text-center text-muted">Belum ada pembayaran masuk.</td></tr>
+                                <tr><td colspan="5" class="text-center text-muted">Belum ada pembayaran masuk.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -146,6 +155,7 @@
                     <dt class="col-5">Status</dt><dd class="col-7">{{ ucfirst($invoice->status) }}</dd>
                 </dl>
                 <a href="{{ route('invoices.show', $invoice) }}" class="btn btn-sm btn-outline-info"><i class="fas fa-eye mr-1"></i> Lihat</a>
+                <a href="{{ route('invoices.print', $invoice) }}" target="_blank" class="btn btn-sm btn-outline-secondary"><i class="fas fa-print mr-1"></i> Cetak</a>
                 @if($invoice->pdf_path)
                     <a href="{{ route('invoices.download', $invoice) }}" class="btn btn-sm btn-outline-primary"><i class="fas fa-download mr-1"></i> PDF</a>
                 @endif

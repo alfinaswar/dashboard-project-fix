@@ -25,7 +25,7 @@ class SettingSeeder extends Seeder
             'signee_name' => 'Alfin',
             'invoice_due_days' => '14',
             'revision_days' => '14',
-            'invoice_number_format' => 'INV/{YYYY}/{MM}/{NUMBER}',
+            'invoice_number_format' => 'ORD/{YYYY}/{MM}/{NUMBER}',
             'agreement_number_format' => 'PKS/{YYYY}/{NUMBER}',
             'app_timezone' => 'Asia/Jakarta',
             'currency' => 'IDR',

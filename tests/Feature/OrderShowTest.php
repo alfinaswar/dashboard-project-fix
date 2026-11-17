@@ -95,6 +95,70 @@ class OrderShowTest extends TestCase
         $this->assertSame('paid', $order->fresh()->payment_status);
     }
 
+    public function test_invoice_number_uses_order_format_and_resets_monthly(): void
+    {
+        $user = User::factory()->create();
+
+        $march = $this->order($user, ['ordered_at' => '2026-03-01']);
+        $march2 = $this->order($user, ['ordered_at' => '2026-03-20']);
+        $april = $this->order($user, ['ordered_at' => '2026-04-02']);
+
+        $this->assertSame('ORD/2026/03/0001', $march->invoices()->firstOrFail()->number);
+        $this->assertSame('ORD/2026/03/0002', $march2->invoices()->firstOrFail()->number);
+        $this->assertSame('ORD/2026/04/0001', $april->invoices()->firstOrFail()->number);
+    }
+
+    public function test_each_payment_gets_its_own_invoice_linked_to_order_invoice(): void
+    {
+        $user = User::factory()->create();
+        $order = $this->order($user, ['ordered_at' => '2026-03-01']);
+        $orderInvoice = Invoice::where('order_id', $order->id)->firstOrFail();
+
+        $this->actingAs($user)->post(route('orders.payments.store', $order), [
+            'paid_at' => '2026-03-05', 'amount' => 400000, 'method' => 'transfer',
+        ])->assertRedirect(route('orders.show', $order));
+
+        $this->actingAs($user)->post(route('orders.payments.store', $order), [
+            'paid_at' => '2026-03-07', 'amount' => 600000, 'method' => 'cash',
+        ])->assertRedirect(route('orders.show', $order));
+
+        $paymentInvoices = Invoice::where('payment_id', '!=', null)->orderBy('id')->get();
+
+        $this->assertCount(2, $paymentInvoices);
+        $this->assertSame('ORD/2026/03/0001-B1', $paymentInvoices[0]->number);
+        $this->assertSame(400000, $paymentInvoices[0]->total);
+        $this->assertSame('ORD/2026/03/0001-B2', $paymentInvoices[1]->number);
+        $this->assertSame(600000, $paymentInvoices[1]->total);
+
+        // Tagihan order tetap dihitung dari invoice order, bukan invoice pembayaran.
+        $this->assertSame(1000000, $orderInvoice->refresh()->total);
+
+        // Tiap baris pembayaran punya tombol lihat dan cetak invoice.
+        $this->actingAs($user)->get(route('orders.show', $order))
+            ->assertOk()
+            ->assertSee(route('invoices.show', $paymentInvoices[0]), false)
+            ->assertSee(route('invoices.print', $paymentInvoices[1]), false);
+    }
+
+    public function test_order_invoice_page_lists_every_payment(): void
+    {
+        $user = User::factory()->create();
+        $order = $this->order($user, ['ordered_at' => '2026-03-01']);
+        $orderInvoice = Invoice::where('order_id', $order->id)->firstOrFail();
+
+        foreach ([['2026-03-05', 400000, 'transfer'], ['2026-03-07', 600000, 'cash']] as [$paidAt, $amount, $method]) {
+            $this->actingAs($user)->post(route('orders.payments.store', $order), [
+                'paid_at' => $paidAt, 'amount' => $amount, 'method' => $method,
+            ]);
+        }
+
+        $this->actingAs($user)->get(route('invoices.show', $orderInvoice))
+            ->assertOk()
+            ->assertSee('Riwayat Pembayaran')
+            ->assertSee('ORD/2026/03/0001-B1')
+            ->assertSee('ORD/2026/03/0001-B2');
+    }
+
     public function test_withdrawal_feature_is_removed(): void
     {
         $user = User::factory()->create();

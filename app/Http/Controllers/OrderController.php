@@ -17,12 +17,12 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        $order->load(['client', 'platform', 'servicePackage', 'feeItems', 'invoices.payments', 'agreements.versions']);
+        $order->load(['client', 'platform', 'servicePackage', 'feeItems', 'invoices.payments.paymentInvoice', 'agreements.versions']);
 
         // Order lama tanpa dokumen tetap dilengkapi saat dibuka.
         $invoice = $this->documents->ensureInvoice($order);
         $agreement = $this->documents->ensureAgreement($order);
-        $order->setRelation('invoices', $order->invoices()->with('payments')->latest('id')->get());
+        $order->setRelation('invoices', $order->orderInvoices()->with('payments.paymentInvoice')->latest('id')->get());
 
         return view('orders.show', [
             'order' => $order,
