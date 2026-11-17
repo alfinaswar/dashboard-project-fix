@@ -35,25 +35,19 @@ class PrivateDiskTest extends TestCase
         $user = User::factory()->create();
         $client = Client::create(['name' => 'Klien A']);
         $platform = \App\Models\Platform::create(['name' => 'Fastwork', 'code' => 'fw-'.uniqid()]);
+        \App\Models\DocumentTemplate::create(['type' => 'invoice', 'name' => 'Invoice Standar', 'body' => '<p>{{ nomor_invoice }}</p>', 'is_default' => true]);
         $order = Order::create([
             'client_id' => $client->id, 'platform_id' => $platform->id, 'title' => 'Desain',
             'ordered_at' => '2026-03-01', 'status' => 'completed', 'gross_amount' => 100000,
         ]);
 
-        $this->actingAs($user)->post(route('invoices.store'), [
-            'number' => '',
-            'order_id' => $order->id,
-            'source' => 'generated',
-            'issued_at' => '2026-03-02',
-            'due_date' => '2026-03-16',
-            'subtotal' => 100000,
-            'tax_amount' => 0,
-            'status' => 'unpaid',
-        ])->assertRedirect(route('invoices.index'));
+        // Invoice dibuat otomatis saat order dibuka.
+        $this->actingAs($user)->get(route('orders.show', $order))->assertOk();
 
         $invoice = Invoice::firstOrFail();
         $this->assertNotNull($invoice->pdf_path);
         $this->assertTrue(Storage::disk('private')->exists($invoice->pdf_path));
+        $this->assertSame(100000, $invoice->total);
 
         $this->actingAs($user)->get(route('invoices.download', $invoice))->assertOk();
     }

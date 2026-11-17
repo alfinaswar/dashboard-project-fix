@@ -88,6 +88,7 @@
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column nav-flat" data-widget="treeview" role="menu" data-accordion="false">
                     @foreach(config('menu', []) as $item)
+                        @continue(!empty($item['hidden']))
                         @if(isset($item['header']))
                             <li class="nav-header text-uppercase font-weight-bold text-muted small mt-2">{{ $item['header'] }}</li>
                         @else
@@ -144,36 +145,30 @@
         <!-- Main content -->
         <section class="content">
             <div class="container-fluid">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
-                        <i class="icon fas fa-check mr-2"></i> {{ session('success') }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                @endif
+                @php
+                    // Notifikasi tampil lewat SweetAlert2, bukan alert inline.
+                    $sweetAlerts = [];
 
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                        <i class="icon fas fa-ban mr-2"></i> {{ session('error') }}
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                @endif
+                    if (session('success')) {
+                        $sweetAlerts[] = ['type' => 'success', 'title' => 'Berhasil', 'text' => session('success')];
+                    }
 
-                @if($errors->any())
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
-                        <h6 class="font-weight-bold mb-1"><i class="icon fas fa-exclamation-triangle mr-2"></i> Terdapat kesalahan pengisian data:</h6>
-                        <ul class="mb-0 pl-3">
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+                    if (session('error')) {
+                        $sweetAlerts[] = ['type' => 'error', 'title' => 'Gagal', 'text' => session('error')];
+                    }
+
+                    if ($errors->any()) {
+                        $sweetAlerts[] = [
+                            'type' => 'error',
+                            'title' => 'Data belum lengkap',
+                            'text' => 'Periksa kembali isian berikut:',
+                            'list' => array_values(array_unique($errors->all())),
+                        ];
+                    }
+                @endphp
+
+                @if($sweetAlerts)
+                    <div id="sweet-alerts" data-alerts="{{ json_encode($sweetAlerts) }}" hidden></div>
                 @endif
 
                 @yield('content')
@@ -213,16 +208,58 @@
         paginate: { next: 'Berikutnya', previous: 'Sebelumnya' }
     };
 
+    // Input nominal: ketik angka, tampil format Indonesia (1.000.000), nilai terkirim tetap polos.
+    function maskRupiah(el) {
+        const raw = el.value.replace(/\D/g, '');
+        el.value = raw ? parseInt(raw, 10).toLocaleString('id-ID') : '';
+    }
+
+    function bindRupiahInputs(root) {
+        (root || document).querySelectorAll('.rupiah-input').forEach(function (el) {
+            if (el.dataset.masked) return;
+            el.dataset.masked = '1';
+            el.addEventListener('input', function () { maskRupiah(el); });
+        });
+    }
+
+    // Tampilkan notifikasi dari server lewat SweetAlert2.
+    function showSweetAlerts() {
+        const holder = document.getElementById('sweet-alerts');
+        if (!holder || typeof Swal === 'undefined') return;
+
+        let alerts = [];
+        try { alerts = JSON.parse(holder.dataset.alerts || '[]'); } catch (e) { return; }
+
+        alerts.forEach(function (alert) {
+            const isList = Array.isArray(alert.list) && alert.list.length > 0;
+            Swal.fire({
+                icon: alert.type || 'info',
+                title: alert.title || '',
+                html: isList
+                    ? '<p class="mb-2">' + alert.text + '</p><ul class="text-left pl-4 mb-0">' +
+                      alert.list.map(function (msg) { return '<li>' + msg + '</li>'; }).join('') + '</ul>'
+                    : alert.text || '',
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: alert.type === 'error' ? '#dc3545' : '#28a745',
+            });
+        });
+    }
+
     $(function () {
-        // Initialize Select2 Elements
+        bindRupiahInputs();
+        showSweetAlerts();
+
+        // Select2
         $('.select2').select2({
             theme: 'bootstrap4'
         });
 
-        // Auto close alerts after 5 seconds
-        setTimeout(function() {
-            $(".alert:not(.alert-danger)").fadeOut('slow');
-        }, 5000);
+        // Form mengirim angka tanpa titik pemisah.
+        $('form').on('submit', function () {
+            $(this).find('.rupiah-input').each(function () {
+                this.value = this.value.replace(/\D/g, '');
+            });
+        });
     });
 </script>
 

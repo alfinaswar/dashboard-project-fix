@@ -12,7 +12,6 @@ class Platform extends Model
         'code',
         'commission_percent',
         'fixed_fee',
-        'withdrawal_fee',
         'notes',
         'is_active',
     ];
@@ -20,7 +19,6 @@ class Platform extends Model
     protected $casts = [
         'commission_percent' => 'decimal:2',
         'fixed_fee' => 'integer',
-        'withdrawal_fee' => 'integer',
         'is_active' => 'boolean',
     ];
 

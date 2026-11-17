@@ -17,22 +17,11 @@ return [
         'active' => ['orders.*'],
     ],
     [
-        'text' => 'Penarikan Saldo',
-        'route' => 'withdrawals.index',
-        'icon' => 'fas fa-wallet',
-        'active' => ['withdrawals.*'],
-    ],
-    [
-        'text' => 'Invoice',
-        'route' => 'invoices.index',
-        'icon' => 'fas fa-file-invoice-dollar',
-        'active' => ['invoices.*'],
-    ],
-    [
-        'text' => 'Perjanjian Kerjasama',
-        'route' => 'agreements.index',
-        'icon' => 'fas fa-file-contract',
-        'active' => ['agreements.*'],
+        'text' => 'Pembayaran Masuk',
+        'route' => 'payments.index',
+        'icon' => 'fas fa-money-bill-wave',
+        'hidden' => true,
+        'active' => ['payments.*'],
     ],
     [
         'text' => 'Langganan & Masa Aktif',
@@ -41,17 +30,12 @@ return [
         'active' => ['subscriptions.*'],
     ],
     [
-        'text' => 'Pembayaran Masuk',
-        'route' => 'payments.index',
-        'icon' => 'fas fa-money-bill-wave',
-        'active' => ['payments.*'],
-    ],
-    [
         'text' => 'Pengeluaran',
         'route' => 'expenses.index',
         'icon' => 'fas fa-receipt',
         'active' => ['expenses.*'],
         'soon' => true,
+        'hidden' => true,
     ],
     [
         'text' => 'Proyek & Progress',

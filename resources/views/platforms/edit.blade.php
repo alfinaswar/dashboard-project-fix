@@ -21,18 +21,12 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label for="name">Nama Platform <span class="text-danger">*</span></label>
-                            <input placeholder="Masukkan name" type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $platform->name) }}" required>
-                            @error('name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input placeholder="Contoh: Fastwork" type="text" class="form-control" id="name" name="name" value="{{ old('name', $platform->name) }}" required>
                         </div>
 
                         <div class="col-md-6 form-group">
                             <label for="code">Kode Unik <span class="text-danger">*</span></label>
-                            <input placeholder="Masukkan code" type="text" class="form-control @error('code') is-invalid @enderror" id="code" name="code" value="{{ old('code', $platform->code) }}" required>
-                            @error('code')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            <input placeholder="Contoh: fastwork" type="text" class="form-control" id="code" name="code" value="{{ old('code', $platform->code) }}" required>
                         </div>
                     </div>
 
@@ -40,14 +34,11 @@
                         <div class="col-md-4 form-group">
                             <label for="commission_percent">Komisi Platform (%) <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input placeholder="Masukkan commission percent" type="number" step="0.01" min="0" max="100" class="form-control @error('commission_percent') is-invalid @enderror" id="commission_percent" name="commission_percent" value="{{ old('commission_percent', $platform->commission_percent) }}" required>
+                                <input placeholder="Contoh: 20" type="number" step="0.01" min="0" max="100" class="form-control" id="commission_percent" name="commission_percent" value="{{ old('commission_percent', $platform->commission_percent) }}" required>
                                 <div class="input-group-append">
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            @error('commission_percent')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
 
                         <div class="col-md-4 form-group">
@@ -56,33 +47,14 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">Rp</span>
                                 </div>
-                                <input placeholder="Masukkan fixed fee" type="number" min="0" class="form-control @error('fixed_fee') is-invalid @enderror" id="fixed_fee" name="fixed_fee" value="{{ old('fixed_fee', $platform->fixed_fee) }}" required>
+                                <input placeholder="Isi 0 jika tidak ada" type="text" inputmode="numeric" autocomplete="off" class="form-control rupiah-input" id="fixed_fee" name="fixed_fee" value="{{ old('fixed_fee', $platform->fixed_fee) }}" required>
                             </div>
-                            @error('fixed_fee')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="col-md-4 form-group">
-                            <label for="withdrawal_fee">Biaya Penarikan Saldo (Rp) <span class="text-danger">*</span></label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Rp</span>
-                                </div>
-                                <input placeholder="Masukkan withdrawal fee" type="number" min="0" class="form-control @error('withdrawal_fee') is-invalid @enderror" id="withdrawal_fee" name="withdrawal_fee" value="{{ old('withdrawal_fee', $platform->withdrawal_fee) }}" required>
-                            </div>
-                            @error('withdrawal_fee')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="notes">Catatan Tambahan</label>
-                        <textarea placeholder="Masukkan notes" class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3">{{ old('notes', $platform->notes) }}</textarea>
-                        @error('notes')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <textarea placeholder="Informasi tambahan mengenai platform ini" class="form-control" id="notes" name="notes" rows="3">{{ old('notes', $platform->notes) }}</textarea>
                     </div>
 
                     <div class="form-group">

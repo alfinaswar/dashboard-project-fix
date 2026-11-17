@@ -8,7 +8,7 @@
     @foreach([
         ['monthlyNet', 'Pendapatan Bersih Bulan Ini', 'success', 'orders.index'],
         ['monthlyFees', 'Potongan Platform Bulan Ini', 'warning', 'orders.index'],
-        ['balancePending', 'Saldo Fastwork Belum Ditarik', 'info', 'orders.index'],
+        ['balancePending', 'Total Tagihan Belum Dibayar', 'info', 'orders.index'],
         ['unpaidInvoices', 'Tagihan Belum Lunas', 'danger', 'invoices.index'],
     ] as [$metric, $label, $color, $route])
         <div class="col-lg-3 col-6"><div class="small-box bg-white border shadow-sm"><div class="inner"><h3 class="text-{{ $color }} font-weight-bold">{{ format_rupiah($$metric) }}</h3><p class="text-muted mb-0">{{ $label }}</p></div><a href="{{ route($route) }}" class="small-box-footer text-{{ $color }} font-weight-bold bg-light">Lihat detail <i class="fas fa-arrow-circle-right"></i></a></div></div>
@@ -163,8 +163,7 @@
                         <i class="fas fa-check-circle mr-1"></i> Sistem siap digunakan
                     </h6>
                     <p class="small text-muted mb-0">
-                        Auth, master data, order, invoice, perjanjian, langganan, proyek, dashboard, laporan, dan notifikasi tersedia.
-                    </p>
+                        Auth, master data, order, invoice, perjanjian, langganan, proyek, dashboard, laporan, dan notifikasi tersedia.                    </p>
                 </div>
                 <div class="callout callout-info mb-3">
                     <h6 class="font-weight-bold text-info mb-1">

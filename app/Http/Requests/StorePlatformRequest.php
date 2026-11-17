@@ -18,7 +18,6 @@ class StorePlatformRequest extends FormRequest
             'code' => ['required', 'string', 'max:50', 'alpha_dash', 'unique:platforms,code'],
             'commission_percent' => ['required', 'numeric', 'between:0,100'],
             'fixed_fee' => ['required', 'integer', 'min:0'],
-            'withdrawal_fee' => ['required', 'integer', 'min:0'],
             'notes' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
         ];
@@ -36,8 +35,6 @@ class StorePlatformRequest extends FormRequest
             'commission_percent.between' => 'Persentase komisi harus bernilai antara 0 hingga 100.',
             'fixed_fee.required' => 'Biaya tetap platform wajib diisi (isi 0 jika tidak ada).',
             'fixed_fee.integer' => 'Biaya tetap harus berupa bilangan bulat.',
-            'withdrawal_fee.required' => 'Biaya penarikan wajib diisi (isi 0 jika tidak ada).',
-            'withdrawal_fee.integer' => 'Biaya penarikan harus berupa bilangan bulat.',
         ];
     }
 

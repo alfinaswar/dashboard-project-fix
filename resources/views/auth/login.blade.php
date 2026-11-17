@@ -25,40 +25,46 @@
         <div class="card-body login-card-body p-4">
             <p class="login-box-msg text-muted pb-2">Silakan masuk untuk mengelola sistem</p>
 
-            @if(session('error'))
-                <div class="alert alert-danger py-2 small">
-                    {{ session('error') }}
-                </div>
+            @php
+                // Notifikasi tampil lewat SweetAlert2, bukan alert inline.
+                $sweetAlerts = [];
+
+                if (session('error')) {
+                    $sweetAlerts[] = ['type' => 'error', 'title' => 'Gagal masuk', 'text' => session('error')];
+                }
+
+                if ($errors->any()) {
+                    $sweetAlerts[] = [
+                        'type' => 'error',
+                        'title' => 'Data belum lengkap',
+                        'text' => 'Periksa kembali isian berikut:',
+                        'list' => array_values(array_unique($errors->all())),
+                    ];
+                }
+            @endphp
+
+            @if($sweetAlerts)
+                <div id="sweet-alerts" data-alerts="{{ json_encode($sweetAlerts) }}" hidden></div>
             @endif
 
             <form action="{{ route('login') }}" method="post">
                 @csrf
                 <div class="input-group mb-3">
-                    <input type="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="Email" required autofocus>
+                    <input type="email" name="email" value="{{ old('email') }}" class="form-control" placeholder="Email" required autofocus>
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-envelope"></span>
                         </div>
                     </div>
-                    @error('email')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
                 </div>
 
                 <div class="input-group mb-3">
-                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Kata Sandi" required>
+                    <input type="password" name="password" class="form-control" placeholder="Kata Sandi" required>
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-lock"></span>
                         </div>
                     </div>
-                    @error('password')
-                        <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                        </span>
-                    @enderror
                 </div>
 
                 <div class="row align-items-center mb-3">
@@ -89,7 +95,36 @@
 <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
 <!-- Bootstrap 4 -->
 <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<!-- SweetAlert2 -->
+<script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
 <!-- AdminLTE App -->
 <script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
+
+<script>
+    // Tampilkan notifikasi dari server lewat SweetAlert2.
+    function showSweetAlerts() {
+        const holder = document.getElementById('sweet-alerts');
+        if (!holder || typeof Swal === 'undefined') return;
+
+        let alerts = [];
+        try { alerts = JSON.parse(holder.dataset.alerts || '[]'); } catch (e) { return; }
+
+        alerts.forEach(function (alert) {
+            const isList = Array.isArray(alert.list) && alert.list.length > 0;
+            Swal.fire({
+                icon: alert.type || 'info',
+                title: alert.title || '',
+                html: isList
+                    ? '<p class="mb-2">' + alert.text + '</p><ul class="text-left pl-4 mb-0">' +
+                      alert.list.map(function (msg) { return '<li>' + msg + '</li>'; }).join('') + '</ul>'
+                    : alert.text || '',
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: alert.type === 'error' ? '#dc3545' : '#28a745',
+            });
+        });
+    }
+
+    showSweetAlerts();
+</script>
 </body>
 </html>

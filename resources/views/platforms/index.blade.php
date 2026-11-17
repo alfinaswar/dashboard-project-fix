@@ -26,7 +26,6 @@
                             <th>Kode</th>
                             <th>Komisi (%)</th>
                             <th>Biaya Tetap</th>
-                            <th>Biaya Tarik</th>
                             <th>Status</th>
                             <th>Klien</th>
                             <th>Aksi</th>
@@ -63,12 +62,12 @@
 
                 <div class="form-group">
                     <label for="sim_gross">Nilai Kotor / Gross (Rp)</label>
-                    <input placeholder="Masukkan " type="number" id="sim_gross" class="form-control" value="1000000" step="1000">
+                    <input placeholder="Masukkan nilai kotor" type="text" inputmode="numeric" autocomplete="off" id="sim_gross" class="form-control rupiah-input" value="1.000.000">
                 </div>
 
                 <div class="form-group">
                     <label for="sim_other">Biaya Lain / Extra (Rp)</label>
-                    <input placeholder="Masukkan " type="number" id="sim_other" class="form-control" value="0" step="1000">
+                    <input placeholder="Masukkan biaya lain" type="text" inputmode="numeric" autocomplete="off" id="sim_other" class="form-control rupiah-input" value="0">
                 </div>
 
                 <div class="p-3 bg-light rounded border">
@@ -102,7 +101,6 @@
                 { data: 'code', name: 'code' },
                 { data: 'commission_percent', name: 'commission_percent' },
                 { data: 'fixed_fee', name: 'fixed_fee' },
-                { data: 'withdrawal_fee', name: 'withdrawal_fee' },
                 { data: 'is_active', name: 'is_active' },
                 { data: 'clients_count', name: 'clients_count', orderable: false, searchable: false },
                 { data: 'actions', name: 'actions', orderable: false, searchable: false }
@@ -118,8 +116,8 @@
         const option = $('#sim_platform option:selected');
         const commPercent = parseFloat(option.data('commission')) || 0;
         const fixedFee = parseInt(option.data('fixed')) || 0;
-        const gross = parseFloat($('#sim_gross').val()) || 0;
-        const other = parseFloat($('#sim_other').val()) || 0;
+        const gross = parseFloat(($('#sim_gross').val() || '').replace(/\D/g, '')) || 0;
+        const other = parseFloat(($('#sim_other').val() || '').replace(/\D/g, '')) || 0;
 
         const platformFee = Math.round((gross * commPercent) / 100) + fixedFee;
         const net = Math.round(gross - platformFee - other);
@@ -130,6 +128,7 @@
     }
 
     $(document).ready(function() {
+        bindRupiahInputs();
         $('#sim_platform, #sim_gross, #sim_other').on('change input', calculateSim);
         calculateSim();
     });

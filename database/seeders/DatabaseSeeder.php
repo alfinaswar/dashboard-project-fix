@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             ExpenseCategorySeeder::class,
             SettingSeeder::class,
             ServicePackageSeeder::class,
+            DocumentTemplateSeeder::class,
         ]);
     }
 }

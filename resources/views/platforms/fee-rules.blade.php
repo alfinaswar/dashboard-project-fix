@@ -86,21 +86,34 @@
 
         $('#components').append(`
             <div class="form-row align-items-center mb-1 component-row">
-                <div class="col-6"><select name="components[${index}][type]" class="form-control form-control-sm">${options}</select></div>
-                <div class="col-4"><input name="components[${index}][value]" type="number" step="0.01" min="0" value="${value}" class="form-control form-control-sm" required></div>
+                <div class="col-6"><select name="components[${index}][type]" class="form-control form-control-sm component-type">${options}</select></div>
+                <div class="col-4">
+                    <div class="input-group input-group-sm">
+                        <input name="components[${index}][value]" type="number" step="0.01" min="0" value="${value}" class="form-control" required>
+                        <div class="input-group-append"><span class="input-group-text component-suffix">%</span></div>
+                    </div>
+                </div>
                 <div class="col-2 text-right"><button type="button" class="btn btn-sm btn-outline-danger remove-component"><i class="fas fa-times"></i></button></div>
             </div>
         `);
     }
 
+    function syncSuffix() {
+        $('.component-row').each(function () {
+            $(this).find('.component-suffix').text($(this).find('.component-type').val() === 'percent' ? '%' : 'Rp');
+        });
+    }
+
     $(function () {
         addComponent();
         $('#add-component').on('click', function () { addComponent(); });
+        $(document).on('change', '.component-type', syncSuffix);
         $(document).on('click', '.remove-component', function () {
             if ($('.component-row').length > 1) {
                 $(this).closest('.component-row').remove();
             }
         });
+        syncSuffix();
     });
 </script>
 @endsection
