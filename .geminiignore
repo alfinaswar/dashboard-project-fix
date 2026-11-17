@@ -1,0 +1,68 @@
+# Dependensi & Package Manager
+node_modules/
+vendor/
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pnp/
+.pnp.js
+
+# Hasil Build & Kompilasi
+dist/
+build/
+out/
+target/
+.next/
+.nuxt/
+.output/
+*.min.js
+*.min.css
+*.map
+
+# Sistem Kontrol Versi & IDE
+.git/
+.svn/
+.hg/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# File Log, Cache & Sementara
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.cache/
+.tmp/
+temp/
+coverage/
+
+# Aset Media & File Biner Besar
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.mp4
+*.mp3
+*.wav
+*.pdf
+*.zip
+*.tar.gz
+*.rar
+*.exe
+*.dll
+*.so
+*.dylib
+*.sqlite
+*.db
+
+# File Rahasia & Environment (Keamanan)
+.env
+.env.*
+*.pem
+*.key

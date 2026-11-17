@@ -1,0 +1,170 @@
+@extends('layouts.admin')
+
+@section('title', 'Dashboard')
+@section('page_title', 'Ringkasan Sistem')
+
+@section('content')
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white border shadow-sm">
+            <div class="inner">
+                <h3 class="text-primary font-weight-bold">{{ $platformCount }}</h3>
+                <p class="text-muted mb-0">Platform Sumber</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-layer-group text-muted" style="opacity: 0.3;"></i>
+            </div>
+            <a href="{{ route('platforms.index') }}" class="small-box-footer text-primary font-weight-bold bg-light">
+                Kelola Platform <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white border shadow-sm">
+            <div class="inner">
+                <h3 class="text-success font-weight-bold">{{ $clientCount }}</h3>
+                <p class="text-muted mb-0">Total Klien Terdaftar</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-users text-muted" style="opacity: 0.3;"></i>
+            </div>
+            <a href="{{ route('clients.index') }}" class="small-box-footer text-success font-weight-bold bg-light">
+                Kelola Klien <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white border shadow-sm">
+            <div class="inner">
+                <h3 class="text-info font-weight-bold">{{ $packageCount }}</h3>
+                <p class="text-muted mb-0">Paket Layanan</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-box-open text-muted" style="opacity: 0.3;"></i>
+            </div>
+            <a href="{{ route('service-packages.index') }}" class="small-box-footer text-info font-weight-bold bg-light">
+                Kelola Paket <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-white border shadow-sm">
+            <div class="inner">
+                <h3 class="text-warning font-weight-bold">{{ $categoryCount }}</h3>
+                <p class="text-muted mb-0">Kategori Pengeluaran</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-tags text-muted" style="opacity: 0.3;"></i>
+            </div>
+            <a href="{{ route('expense-categories.index') }}" class="small-box-footer text-warning font-weight-bold bg-light">
+                Kelola Kategori <i class="fas fa-arrow-circle-right"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-lg-8">
+        <div class="card card-outline card-primary shadow-sm">
+            <div class="card-header bg-white border-bottom-0">
+                <h3 class="card-title font-weight-bold">
+                    <i class="fas fa-user-plus mr-1 text-primary"></i> Klien Terbaru
+                </h3>
+                <div class="card-tools">
+                    <a href="{{ route('clients.create') }}" class="btn btn-sm btn-primary font-weight-bold">
+                        <i class="fas fa-plus mr-1"></i> Tambah Klien
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead>
+                            <tr class="text-muted text-uppercase small">
+                                <th>Nama Klien</th>
+                                <th>Platform</th>
+                                <th>Kontak / Email</th>
+                                <th>No. Telepon</th>
+                                <th class="text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($recentClients as $client)
+                                <tr>
+                                    <td class="font-weight-bold">
+                                        <a href="{{ route('clients.show', $client) }}" class="text-dark">
+                                            {{ $client->name }}
+                                        </a>
+                                        @if($client->company_name)
+                                            <div class="text-muted small">{{ $client->company_name }}</div>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">{{ $client->platform->name ?? 'Langsung' }}</span>
+                                    </td>
+                                    <td>{{ $client->email ?? '-' }}</td>
+                                    <td>{{ $client->phone ?? '-' }}</td>
+                                    <td class="text-right">
+                                        <a href="{{ route('clients.show', $client) }}" class="btn btn-xs btn-outline-primary" title="Lihat Detail">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('clients.edit', $client) }}" class="btn btn-xs btn-outline-secondary" title="Ubah">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-users-slash fa-2x mb-2 d-block"></i>
+                                        Belum ada data klien. Silakan tambah klien pertama Anda.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white text-right">
+                <a href="{{ route('clients.index') }}" class="text-primary font-weight-bold small">
+                    Lihat Semua Klien <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card card-outline card-info shadow-sm">
+            <div class="card-header bg-white border-bottom-0">
+                <h3 class="card-title font-weight-bold">
+                    <i class="fas fa-info-circle mr-1 text-info"></i> Status Fase Pengerjaan
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="callout callout-success mb-3">
+                    <h6 class="font-weight-bold text-success mb-1">
+                        <i class="fas fa-check-circle mr-1"></i> Fase 1: Selesai / Berjalan
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        Setup autentikasi, master platform & klien, paket layanan, kategori pengeluaran, pengaturan usaha, dan kalkulator potongan Fastwork.
+                    </p>
+                </div>
+                <div class="callout callout-info mb-3">
+                    <h6 class="font-weight-bold text-info mb-1">
+                        <i class="fas fa-clock mr-1"></i> Fase 2: Siap Dimulai
+                    </h6>
+                    <p class="small text-muted mb-0">
+                        Pencatatan order Fastwork & klien langsung, perhitungan potongan platform, penarikan saldo (withdrawal), dan pembayaran masuk.
+                    </p>
+                </div>
+                <a href="{{ route('settings.index') }}" class="btn btn-outline-secondary btn-block btn-sm">
+                    <i class="fas fa-sliders-h mr-1"></i> Cek Pengaturan Bisnis
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
