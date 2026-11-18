@@ -71,6 +71,31 @@ class Order extends Model
         return $this->hasMany(Agreement::class);
     }
 
+    public function subscriptions()
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function subscription()
+    {
+        return $this->hasOne(Subscription::class)->latestOfMany();
+    }
+
+    /**
+     * Nilai kontrak langganan berdasarkan platform:
+     * - Fastwork: nilai kotor (gross_amount)
+     * - Langsung / selain fastwork: nilai bersih (net_amount)
+     */
+    public function getSubscriptionContractValueAttribute(): int
+    {
+        $platformCode = strtolower((string) ($this->platform?->code ?? ''));
+        $platformName = strtolower((string) ($this->platform?->name ?? ''));
+
+        $isFastwork = str_contains($platformCode, 'fastwork') || str_contains($platformName, 'fastwork');
+
+        return (int) ($isFastwork ? $this->gross_amount : $this->net_amount);
+    }
+
     /** Status pembayaran dari invoice order: belum ada invoice dianggap belum dibayar. */
     public function getPaymentStatusAttribute(): string
     {

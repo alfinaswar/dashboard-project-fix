@@ -13,6 +13,7 @@ class Subscription extends Model
     public const DURATIONS = ['annual' => 12, 'monthly' => 1, 'one_time' => 0];
 
     protected $fillable = [
+        'order_id',
         'client_id',
         'billing_type',
         'previous_subscription_id',
@@ -29,6 +30,7 @@ class Subscription extends Model
     ];
 
     protected $casts = [
+        'order_id' => 'integer',
         'billing_type' => 'string',
         'start_date' => 'date',
         'end_date' => 'date',
@@ -38,6 +40,11 @@ class Subscription extends Model
         'reminder_7_sent_at' => 'datetime',
         'expired_notified_at' => 'datetime',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 
     public function client()
     {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreSubscriptionRequest;
 use App\Models\Client;
 use App\Models\Invoice;
+use App\Models\Order;
 use App\Models\Subscription;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -16,15 +17,23 @@ class SubscriptionController extends Controller
 
     public function index()
     {
-        $subscriptions = Subscription::with('client')->latest('end_date')->paginate(15);
+        $subscriptions = Subscription::with(['order.client', 'order.platform', 'client'])->latest('end_date')->paginate(15);
 
         return view('subscriptions.index', compact('subscriptions'));
     }
 
     public function create()
     {
+        $orders = Order::with(['client', 'platform'])->latest('ordered_at')->get();
+
         return view('subscriptions.form', [
-            'subscription' => new Subscription(['start_date' => now()->toDateString(), 'status' => 'active', 'billing_type' => 'annual', 'contract_value' => 0]),
+            'subscription' => new Subscription([
+                'start_date' => now()->toDateString(),
+                'status' => 'active',
+                'billing_type' => 'annual',
+                'contract_value' => 0,
+            ]),
+            'orders' => $orders,
             'clients' => Client::orderBy('name')->get(),
         ]);
     }
@@ -32,6 +41,18 @@ class SubscriptionController extends Controller
     public function store(StoreSubscriptionRequest $request)
     {
         $data = $this->withPeriod($request->validated());
+
+        if (!empty($data['order_id'])) {
+            $order = Order::with('platform')->find($data['order_id']);
+            if ($order) {
+                $data['client_id'] = $order->client_id;
+                // Jika nilai kontrak kosong atau 0, otomatis ambil dari order sesuai platform
+                if (empty($data['contract_value'])) {
+                    $data['contract_value'] = $order->subscription_contract_value;
+                }
+            }
+        }
+
         Subscription::create($data);
 
         return redirect()->route('subscriptions.index')->with('success', 'Langganan berhasil ditambahkan.');
@@ -39,17 +60,29 @@ class SubscriptionController extends Controller
 
     public function edit(Subscription $subscription)
     {
+        $orders = Order::with(['client', 'platform'])->latest('ordered_at')->get();
+
         return view('subscriptions.form', [
-            'subscription' => $subscription,
+            'subscription' => $subscription->load(['order.client', 'order.platform', 'client']),
+            'orders' => $orders,
             'clients' => Client::orderBy('name')->get(),
         ]);
     }
 
     public function update(StoreSubscriptionRequest $request, Subscription $subscription)
     {
-        $subscription->update($this->withPeriod($request->validated()));
+        $data = $this->withPeriod($request->validated());
 
-        return back()->with('success', 'Langganan berhasil diperbarui.');
+        if (!empty($data['order_id'])) {
+            $order = Order::find($data['order_id']);
+            if ($order) {
+                $data['client_id'] = $order->client_id;
+            }
+        }
+
+        $subscription->update($data);
+
+        return redirect()->route('subscriptions.index')->with('success', 'Langganan berhasil diperbarui.');
     }
 
     public function renew(Subscription $subscription)
@@ -60,7 +93,8 @@ class SubscriptionController extends Controller
         $months = $subscription->durationMonths();
         $new = DB::transaction(function () use ($subscription, $start, $months) {
             $new = Subscription::create([
-                'client_id' => $subscription->client_id,
+                'order_id' => $subscription->order_id,
+                'client_id' => $subscription->client_id ?? $subscription->order?->client_id,
                 'billing_type' => $subscription->billing_type,
                 'previous_subscription_id' => $subscription->id,
                 'start_date' => $start->toDateString(),
@@ -78,6 +112,7 @@ class SubscriptionController extends Controller
                 'number' => $number,
                 'source' => 'generated',
                 'subscription_id' => $new->id,
+                'order_id' => $new->order_id,
                 'issued_at' => now()->toDateString(),
                 'due_date' => now()->addDays((int) setting('invoice_due_days', 14))->toDateString(),
                 'subtotal' => $new->contract_value,
