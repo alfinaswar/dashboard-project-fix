@@ -14,6 +14,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\AgreementController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DataTableController;
 
@@ -52,6 +53,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/subscriptions/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('subscriptions.renew');
     Route::post('/subscriptions/{subscription}/freeze', [SubscriptionController::class, 'freeze'])->name('subscriptions.freeze');
     Route::resource('projects', ProjectController::class);
+    Route::post('/projects/{project}/stages/{stage}/status', [ProjectController::class, 'updateStageStatus'])->name('projects.stages.update-status');
+    Route::post('/projects/{project}/stages', [ProjectController::class, 'storeStage'])->name('projects.stages.store');
+    Route::delete('/projects/{project}/stages/{stage}', [ProjectController::class, 'destroyStage'])->name('projects.stages.destroy');
+
+    Route::resource('meetings', MeetingController::class);
+    Route::post('/meetings/{meeting}/status', [MeetingController::class, 'updateStatus'])->name('meetings.update-status');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::get('/datatable/orders', [DataTableController::class, 'orders'])->name('datatable.orders');

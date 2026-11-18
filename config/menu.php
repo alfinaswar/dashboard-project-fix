@@ -44,6 +44,12 @@ return [
         'active' => ['projects.*'],
     ],
     [
+        'text' => 'Catatan Meeting',
+        'route' => 'meetings.index',
+        'icon' => 'fas fa-sticky-note',
+        'active' => ['meetings.*'],
+    ],
+    [
         'text' => 'Laporan',
         'route' => 'reports.index',
         'icon' => 'fas fa-chart-bar',

@@ -81,6 +81,21 @@ class Order extends Model
         return $this->hasOne(Subscription::class)->latestOfMany();
     }
 
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function project()
+    {
+        return $this->hasOne(Project::class)->latestOfMany();
+    }
+
+    public function meetings()
+    {
+        return $this->hasMany(Meeting::class);
+    }
+
     /**
      * Nilai kontrak langganan berdasarkan platform:
      * - Fastwork: nilai kotor (gross_amount)
